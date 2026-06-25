@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # 1. Database Service
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cn
+      POSTGRES_PASSWORD: cn_dev_password
+      POSTGRES_DB: cloudnexus
+    ports:
+      - "5433:5432" # Maps to 5433 on the host machine as per your env file, keeping 5432 clean inside the network
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cn -d cloudnexus"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. Backend API Service
+  api:
+    build:
+      context: ./CN-Web-Backend  # Tells Docker to look into the backend folder
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      HOST: "0.0.0.0"
+      DATABASE_URL: postgresql://cn:cn_dev_password@db:5432/cloudnexus?schema=public
+      JWT_SECRET: ${JWT_SECRET:-ktznbbrwbaxaolsq} # Uses your key fallback
+      PORT: "4000"
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: 465
+      SMTP_SECURE: "true"
+      SMTP_USER: pushprajgurjar358@gmail.com
+      SMTP_PASS: ktznbbrwbaxaolsq
+      SMTP_FROM: Cloud Nexus <pushprajgurjar358@gmail.com>
+      ADMIN_OTP_EXPOSE_DEV_CODE: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - uploads_data:/app/uploads
+
+  # 3. Frontend Next.js Service
+  frontend:
+    build:
+      context: ./CN-Web-Frontend  # Tells Docker to look into the frontend folder
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://localhost:4000 # Required at build-time for Next.js standalone setup
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:4000
+      - API_URL=http://localhost:4000
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+  uploads_data:
