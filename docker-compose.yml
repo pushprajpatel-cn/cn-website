@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: cn
-      POSTGRES_PASSWORD: cn_dev_password
+      POSTGRES_PASSWORD: Yout_Passowrd
       POSTGRES_DB: cloudnexus
     ports:
       - "5433:5432" # Maps to 5433 on the host machine as per your env file, keeping 5432 clean inside the network
@@ -36,8 +36,8 @@ services:
       SMTP_HOST: smtp.gmail.com
       SMTP_PORT: 465
       SMTP_SECURE: "true"
-      SMTP_USER: pushprajgurjar358@gmail.com
-      SMTP_PASS: ktznbbrwbaxaolsq
+      SMTP_USER: your@gmail.com
+      SMTP_PASS: YOUR_PASSKEY
       SMTP_FROM: Cloud Nexus <pushprajgurjar358@gmail.com>
       ADMIN_OTP_EXPOSE_DEV_CODE: "false"
     depends_on:
