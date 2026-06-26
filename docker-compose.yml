@@ -38,7 +38,7 @@ services:
       SMTP_SECURE: "true"
       SMTP_USER: your@gmail.com
       SMTP_PASS: YOUR_PASSKEY
-      SMTP_FROM: Cloud Nexus <pushprajgurjar358@gmail.com>
+      SMTP_FROM: Cloud Nexus <yourmail@gmail.com>
       ADMIN_OTP_EXPOSE_DEV_CODE: "false"
     depends_on:
       db:
